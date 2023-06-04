@@ -22,60 +22,88 @@ if ($conn->connect_errno) {
     die("Failed to connect to MySQL: " . $conn->connect_error);
 }
 
-// Check if the file download is requested
-if (isset($_GET['download'])) {
-    $filename = $_GET['download'];
-    $filepath = "uploads/" . $filename;
+// Check if the form is submitted for update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['id']) && isset($_POST['filename'])) {
+        $id = $_POST['id'];
+        $filename = $_POST['filename'];
 
-    if (file_exists($filepath)) {
-        header("Content-Type: application/pdf");
-        header("Content-Disposition: attachment; filename=" . $filename);
-        readfile($filepath);
-        exit;
+        // Retrieve the old filename from the database
+        $filenameQuery = "SELECT filename FROM pdf WHERE id='$id'";
+        $filenameResult = $conn->query($filenameQuery);
+        $oldFilename = $filenameResult->fetch_assoc()['filename'];
+
+        // Update the file name in the database
+        $updateQuery = "UPDATE pdf SET filename='$filename' WHERE id='$id'";
+        if ($conn->query($updateQuery) === TRUE) {
+            // Rename the file on the server
+            $oldFilePath = "uploads/" . $oldFilename;
+            $newFilePath = "uploads/" . $filename;
+            if (rename($oldFilePath, $newFilePath)) {
+                echo "File name updated successfully!";
+            } else {
+                echo "Error updating file name on the server.";
+            }
+        } else {
+            echo "Error updating file name: " . $conn->error;
+        }
     } else {
-        echo "File not found.";
+        echo "Invalid request.";
     }
 }
 
-// Check if the form is submitted
-if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $filename = $_POST['filename'];
-    $content = $_POST['content'];
-
-    // Update the record in the database
-    $sql = "UPDATE pdf SET filename='$filename', content='$content' WHERE id='$id'";
-    if ($conn->query($sql) === TRUE) {
-        echo "Record updated successfully.";
-    } else {
-        echo "Error updating record: " . $conn->error;
-    }
-}
-
-// Retrieve the file details based on the ID
-if (isset($_GET['id']) && isset($_GET['filename'])) {
+// Fetch the file details from the database based on the provided id
+if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $filename = $_GET['filename'];
 
-    // Retrieve the record from the database
-    $sql = "SELECT * FROM pdf WHERE id='$id'";
-    $result = $conn->query($sql);
+    $fileQuery = "SELECT * FROM pdf WHERE id='$id'";
+    $fileResult = $conn->query($fileQuery);
 
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-        $filename = $row['filename'];
-        $content = file_get_contents("uploads/" . $filename);
+    if ($fileResult->num_rows > 0) {
+        $file = $fileResult->fetch_assoc();
+
+        // Retrieve the file path
+        $filepath = "uploads/" . $file['filename'];
+
+        // Check if the file exists
+        if (file_exists($filepath)) {
+            // Serve the file for download
+            if (isset($_GET['download'])) {
+                header("Content-Type: application/pdf");
+                header("Content-Disposition: attachment; filename=" . $file['filename']);
+                readfile($filepath);
+                exit;
+            }
+
+            // Display the file content for viewing
+            if (isset($_GET['view'])) {
+                header("Content-Type: application/pdf");
+                readfile($filepath);
+                exit;
+            }
+
+            // Delete the file
+            if (isset($_GET['delete'])) {
+                // Remove the file from the server
+                unlink($filepath);
+
+                // Delete the file record from the database
+                $deleteQuery = "DELETE FROM pdf WHERE id='$id'";
+                if ($conn->query($deleteQuery) === TRUE) {
+                    echo "File deleted successfully!";
+                } else {
+                    echo "Error deleting file: " . $conn->error;
+                }
+            }
+        } else {
+            echo "File not found.";
+        }
     } else {
         echo "File not found.";
-        exit;
     }
-} else {
-    echo "Invalid request.";
-    exit;
 }
-
-$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,74 +111,99 @@ $conn->close();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update PDF</title>
+    <title>Update PDF File</title>
     <style>
     .container {
-        max-width: 800px;
+        max-width: 500px;
         margin: 0 auto;
         padding: 20px;
+        background-color: #f2f2f2;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
+        margin-top: 0;
+
+        color: #45a049;
         text-align: center;
     }
 
     form {
-        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .form-group {
-        margin-bottom: 15px;
+    input[type="text"],
+    input[type="submit"] {
+        padding: 10px;
+        margin-bottom: 10px;
     }
 
-    .form-group label {
-        display: block;
-        font-weight: bold;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    .form-group textarea {
-        width: 100%;
-        height: 200px;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    .form-group .btn {
-        padding: 8px 12px;
-        background-color: #2196f3;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
+    input[type="submit"] {
+        background-color: #1e90ff;
+        color: white;
         cursor: pointer;
+        border: none;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+
+    p {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    a {
+        color: #1e90ff;
+        text-decoration: none;
+
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #45a049;
     }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Update PDF</h1>
+        <h1>Update PDF File</h1>
+
+        <?php
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+
+            $fileQuery = "SELECT * FROM pdf WHERE id='$id'";
+            $fileResult = $conn->query($fileQuery);
+
+            if ($fileResult->num_rows > 0) {
+                $file = $fileResult->fetch_assoc();
+                ?>
+
+
         <form method="POST" action="">
-            <div class="form-group">
-                <label for="filename">Filename:</label>
-                <input type="text" id="filename" name="filename" value="<?php echo $filename; ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="content">Content:</label>
-                <textarea id="content" name="content" required><?php echo $content; ?></textarea>
-            </div>
-            <input type="hidden" name="id" value="<?php echo $id; ?>">
-            <div class="form-group">
-                <input type="submit" name="update" value="Update" class="btn">
-            </div>
+            <input type="hidden" name="id" value="<?php echo $file['id']; ?>">
+            <input type="text" name="filename" value="<?php echo $file['filename']; ?>">
+            <input type="submit" value="Update">
         </form>
+
+
+        <?php
+            } else {
+                echo "File not found.";
+            }
+        } else {
+            echo "Invalid request.";
+        }
+        ?>
+
+        <p>
+            <a href="download.php">Back to File List</a>
+        </p>
     </div>
 </body>
 

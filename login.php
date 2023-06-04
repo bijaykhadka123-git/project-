@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user) {
             if (password_verify($_POST["password"], $user["hash_password"])) {
                 $_SESSION["user_id"] = $user["id"];
+                $_SESSION["role"] = $user["role"]; // Set the "role" value in the session
 
                 // Redirect the user to the appropriate dashboard based on the user role
                 if ($user["role"] === "admin") {
@@ -41,6 +42,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         die("Query failed: " . $mysqli->error);
     }
+}
+
+// Check if the file download is requested
+if (isset($_GET['download'])) {
+    $filename = $_GET['download'];
+
+    // Perform necessary checks and retrieve the file path from the database
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "project";
+
+    $conn = new mysqli($host, $username, $password, $database);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $filename = $conn->real_escape_string($filename);
+    $sql = "SELECT * FROM pdf WHERE filename = '$filename'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $filepath = "/path/to/your/pdf/files/" . $row['filename']; // Replace with the actual path to your PDF files
+
+        if (file_exists($filepath)) {
+            header("Content-Type: application/pdf");
+            header("Content-Disposition: attachment; filename=" . $row['filename']);
+            readfile($filepath);
+            exit;
+        } else {
+            echo "File not found.";
+        }
+    } else {
+        echo "File not found.";
+    }
+}
+
+// Logout functionality
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: login.php");
+    exit();
 }
 ?>
 

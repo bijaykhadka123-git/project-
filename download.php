@@ -25,15 +25,22 @@ if ($conn->connect_errno) {
 // Check if the file download is requested
 if (isset($_GET['download'])) {
     $filename = $_GET['download'];
-    $filepath = "uploads/" . $filename;
 
-    if (file_exists($filepath)) {
-        header("Content-Type: application/pdf");
-        header("Content-Disposition: attachment; filename=" . $filename);
-        readfile($filepath);
-        exit;
-    } else {
-        echo "File not found.";
+    $sql = "SELECT * FROM pdf WHERE filename = '$filename'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $filepath = "uploads/" . $row['filename'];
+
+        if (file_exists($filepath)) {
+            header("Content-Type: application/pdf");
+            header("Content-Disposition: attachment; filename=" . $row['filename']);
+            readfile($filepath);
+            exit;
+        } else {
+            echo "File not found.";
+        }
     }
 }
 
