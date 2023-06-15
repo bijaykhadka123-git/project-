@@ -7,9 +7,45 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_destroy();
 
     // Redirect the admin to the login page
-    header("Location: index.php");
+    header("Location:auth/index.html");
     exit();
 }
+
+$host = "localhost";
+$username = "root";
+$password = "";
+$database = "project";
+
+$conn = new mysqli($host, $username, $password, $database);
+
+if ($conn->connect_errno) {
+    die("Failed to connect to MySQL: " . $conn->connect_error);
+}
+
+// Check if the file download is requested
+if (isset($_GET['download'])) {
+    $filename = $_GET['download'];
+
+    $sql = "SELECT * FROM pdf WHERE filename = '$filename'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $filepath = "uploads/" . $row['filename'];
+
+        if (file_exists($filepath)) {
+            header("Content-Type: application/pdf");
+            header("Content-Disposition: attachment; filename=" . $row['filename']);
+            readfile($filepath);
+            exit;
+        } else {
+            echo "File not found.";
+        }
+    }
+}
+
+$sql = "SELECT * FROM pdf";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -20,134 +56,126 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- Additional styles or scripts for the dashboard -->
-    <style>
-    .container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f5f5f5;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-family: Verdana, Geneva, Tahoma, sans-serif;
-        color: #d32f2f;
-    }
-
-    form {
-        margin-bottom: 20px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    input[type="file"] {
-        display: block;
-        margin-bottom: 10px;
-    }
-
-    input[type="submit"],
-    button {
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button {
-        background-color: #f44336;
-        margin-left: 10px;
-    }
-
-    button.btn {
-        background-color: #f44336;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button.btn1 {
-        background-color: #f44336;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button.btn:hover {
-        background-color: #d32f2f;
-    }
-    </style>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="admin.css" />
 </head>
 
 <body>
+    <!-- Add the sidebar code here -->
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <i class='bx bxs-smile'></i>
+            <span class="text">AdminHub</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="#">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-doughnut-chart'></i>
+                    <span class="text">Analyst </span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Message</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-cog'></i>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="?action=logout">
+                    <i class='bx bxs-log-out-circle'></i>
 
-    <!-- Dashboard content -->
-    <?php
-    $host = "localhost";
-$username = "root";
-$password = "";
-$database = "project";
+                    <span class="logout-button">Logout</span>
 
-$conn = new mysqli($host, $username, $password, $database);
+                </a>
+            </li>
+        </ul>
+    </section>
+    <!-- End of sidebar code -->
+    <a href="#" class="notification">
+        <i class='bx bxs-bell'></i>
+        <span class="num">8</span>
+    </a>
 
-if ($conn->connect_errno) {
-    die("Failed to connect to MySQL: " . $conn->connect_error);
-}
-    
-    // Check if file is uploaded
-    if (isset($_POST['submit'])) {
-        $targetDir = "uploads/";
-        $targetFile = $targetDir . basename($_FILES["pdfFile"]["name"]);
-        $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    <input type="checkbox" id="switch-mode" hidden>
+    <label for="switch-mode" class="switch-mode"></label>
 
-        // Check file size is less than 1GB
-        if ($fileType != "pdf" || $_FILES["pdfFile"]["size"] > 1000000000) {
-            echo "Error: Only files less than 1GB can be uploaded.";
-        } else {
-            // Move uploaded file into upload folder
-            if (move_uploaded_file($_FILES["pdfFile"]["tmp_name"], $targetFile)) {
-                $filename = $_FILES["pdfFile"]["name"];
-                $folder_path = $targetDir;
-                $time_stamp = date('Y-m-d H:i:s');
-                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp) VALUES ('$filename', '$folder_path', '$time_stamp')";
-                if ($conn->query($sql) === TRUE) {
-                    echo "File uploaded successfully.";
-                } else {
-                  echo "Error: " . $sql . "<br>" . $conn->error;
+    <!-- NAVBAR -->
 
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <table>
+            <a href="upload.php" class="btn-upload">
+                <i class='bx bxs-cloud-upload'></i>
+                <span class="text">upload PDF</span>
+            </a>
+            <tr>
+                <th>Sr. No.</th>
+                <th>File Name</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            $count = 1;
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . $count . "</td>";
+                    echo "<td>" . $row['filename'] . "</td>";
+                    echo '<td>
+                    
+                            <a href="?download=' . $row['filename'] . '" class="btn btn-info">Download</a>
+                            <a href="view.php?id=' . $row['id'] . '" class="btn btn-primary">View</a>
+                            <a href="update.php?id=' . $row['id'] . '" class="btn btn-warning">Update</a>
+                            <a href="delete.php?id=' . $row['id'] . '" class="btn btn-danger">Delete</a>
+                          </td>';
+                    echo "</tr>";
+                    $count++;
                 }
             } else {
-                echo "Error uploading file.";
+                echo "<tr><td colspan='3'>No records found.</td></tr>";
             }
-        }
-    }
-    // close database conn
-    $conn->close();
-    ?>
-    <div class="container">
-        <h1>upload pdf file here</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <label for="pdfFile">Choose a PDF file:</label>
-            <input type="file" id="pdfFile" name="pdfFile" required>
-            <input type="submit" name="submit" value="Upload">
-            <button class="btn" name="btn"> reset</button>
-            <button class="btn1"><a href="download.php"> more</a></button>
-
-        </form>
+            ?>
+        </table>
+        <div class="message">
+            <?php
+            if (isset($_GET['message'])) {
+                echo $_GET['message'];
+            }
+            ?>
+        </div>
     </div>
 
-    <p><button><a href="?action=logout">Logout</a></button></p>
+
+
+
+    </div>
+
+    <script>
+    const switchMode = document.getElementById('switch-mode');
+
+    switchMode.addEventListener('change', function() {
+        if (this.checked) {
+            // Checkbox is checked, perform action for checked state
+            document.body.classList.add('dark-mode');
+        } else {
+            // Checkbox is unchecked, perform action for unchecked state
+            document.body.classList.remove('dark-mode');
+        }
+    });
+    </script>
+
 </body>
 
 </html>

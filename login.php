@@ -112,6 +112,10 @@ if (isset($_GET['logout'])) {
         flex-direction: column;
     }
 
+    h1 {
+        text-align: center;
+    }
+
     label {
         margin-bottom: 5px;
     }
@@ -149,6 +153,7 @@ if (isset($_GET['logout'])) {
         <em>Invalid login</em>
         <?php endif; ?>
         <form method="POST">
+            <h1>login</h1>
             <label for="email">Email</label>
             <input type="email" id="email" name="email"
                 value="<?= isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "" ?>">

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Library Cards</title>
+    <style>
+      .library-cards {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        background: white;
+        color: #888;
+        border: navajowhite;
+      }
+
+      .library-card {
+        width: 300px;
+        height: 200px;
+        border: 2px solid #000;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 20px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+      }
+
+      .library-card h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .library-card p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+
+      .library-card .card-number {
+        font-size: 20px;
+      }
+
+      .library-card .expiration-date {
+        font-size: 12px;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="library-cards">
+      <div class="library-card">
+        <h2>Library Card</h2>
+        <p>Name: John Doe</p>
+        <p>Member since: January 2023</p>
+        <p class="card-number">Card Number: 1234 5678 9012 3456</p>
+        <p class="expiration-date">Expires: December 2024</p>
+      </div>
+
+      <div class="library-card">
+        <h2>Library Card</h2>
+        <p>Name: Jane Smith</p>
+        <p>Member since: March 2022</p>
+        <p class="card-number">Card Number: 9876 5432 1098 7654</p>
+        <p class="expiration-date">Expires: November 2023</p>
+      </div>
+
+      <div class="library-card">
+        <h2>Library Card</h2>
+        <p>Name: Alex Johnson</p>
+        <p>Member since: August 2021</p>
+        <p class="card-number">Card Number: 5678 9012 3456 7890</p>
+        <p class="expiration-date">Expires: October 2023</p>
+      </div>
+    </div>
+  </body>
+</html>

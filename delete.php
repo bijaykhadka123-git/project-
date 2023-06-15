@@ -27,7 +27,7 @@ if (isset($_GET['id'])) {
             // Delete the record from the database
             $deleteSql = "DELETE FROM pdf WHERE id = '$id'";
             if ($conn->query($deleteSql)) {
-                echo "File deleted successfully.";
+                echo '<script>alert("File deleted successfully.");</script>';
             } else {
                 echo "Error deleting file: " . $conn->error;
             }

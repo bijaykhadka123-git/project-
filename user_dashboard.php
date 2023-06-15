@@ -125,7 +125,7 @@ if (isset($_GET['view'])) {
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location:auth/index.html");
     exit();
 }
 ?>
@@ -140,13 +140,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <style>
-    /* CSS for dashboard page */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
     .dashboard-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
     }
 
     table {
@@ -156,57 +164,75 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
     th,
     td {
-        padding: 8px;
+        padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
     }
 
     tr:hover {
         background-color: #f5f5f5;
     }
 
-    .logout-button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: #fff;
+    .view-button,
+    .download-button {
+        display: inline-block;
+        padding: 6px 10px;
+        margin-right: 5px;
         border: none;
-        border-radius: 3px;
-        cursor: pointer;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
         text-decoration: none;
-    }
-
-    .logout-button:hover {
-        background-color: #45a049;
-    }
-
-    .logout-button:active {
-        background-color: #3e8e41;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
     .view-button {
-        padding: 8px 12px;
-        background-color: #337ab7;
+        background-color: #2196f3;
         color: #fff;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
+    }
+
+    .download-button {
+        background-color: #4caf50;
+        color: #fff;
+    }
+
+    .view-button:hover,
+    .download-button:hover {
+        background-color: #45a049;
+    }
+
+    .logout-button {
+        display: inline-block;
+        padding: 8px 12px;
+        background-color: #f44336;
+        color: #fff;
         text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
     }
 
-    .view-button:hover {
-        background-color: #286090;
+    .logout-button:hover {
+        background-color: #d32f2f;
     }
 
-    .view-button:active {
-        background-color: #204d74;
+    .message {
+        text-align: center;
+        margin-top: 20px;
     }
     </style>
 </head>
 
 <body>
     <div class="dashboard-container">
-        <h1>Welcome, <?php echo $_SESSION['user_id']; ?>!</h1>
+        <h1>Welcome to e-library </h1>
         <table>
             <tr>
                 <th>No.</th>
@@ -235,28 +261,22 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
                     echo "<td>" . $count . "</td>";
                     echo "<td>" . $row['filename'] . "</td>";
                     echo "<td>";
+                  echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
 
-                    // Check if the user has access to view the file
-                    if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'user') {
-                        echo '<a href="?download=' . $row['filename'] . '" class="btn btn-info">Download</a> ';
-                    }
-
-                    // Check if the user has access to view the file
-                    if ($_SESSION['role'] === 'admin') {
-                        echo '<a href="?view=' . $row['id'] . '" class="view-button">View</a>';
-                    }
-
+                    echo "<a class='view-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
                     echo "</td>";
                     echo "</tr>";
                     $count++;
                 }
             } else {
-                echo "<tr><td colspan='3'>No records found.</td></tr>";
+                echo "<tr><td colspan='3'>No files available.</td></tr>";
             }
+            $conn->close();
             ?>
         </table>
+
     </div>
-    <button class="logout-button"><a href="?action=logout">Logout</a></button>
+    <a class="logout-button" href="?action=logout">Logout</a>
 </body>
 
 </html>
