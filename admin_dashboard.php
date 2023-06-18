@@ -11,6 +11,18 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     exit();
 }
 
+
+
+
+
+// Check if the user is not logged in
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
+    // Redirect the user to the login page
+    header("Location:login.php");
+    exit();
+}
+
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -104,13 +116,19 @@ $result = $conn->query($sql);
         </ul>
     </section>
     <!-- End of sidebar code -->
-    <a href="#" class="notification">
-        <i class='bx bxs-bell'></i>
-        <span class="num">8</span>
-    </a>
+    <nav id="navbar">
+        <div class="switch-mode">
+            <input type="checkbox" id="switch-mode-checkbox" hidden>
+            <label for="switch-mode-checkbox" class="slider"></label>
+        </div>
 
-    <input type="checkbox" id="switch-mode" hidden>
-    <label for="switch-mode" class="switch-mode"></label>
+        <a href="#" class="notification">
+            <i class="bx bxs-bell"></i>
+            <span class="notification-count">8</span>
+        </a>
+    </nav>
+
+
 
     <!-- NAVBAR -->
 
@@ -163,16 +181,13 @@ $result = $conn->query($sql);
     </div>
 
     <script>
-    const switchMode = document.getElementById('switch-mode');
+    // Get the switch mode checkbox element
+    const switchModeCheckbox = document.getElementById('switch-mode-checkbox');
 
-    switchMode.addEventListener('change', function() {
-        if (this.checked) {
-            // Checkbox is checked, perform action for checked state
-            document.body.classList.add('dark-mode');
-        } else {
-            // Checkbox is unchecked, perform action for unchecked state
-            document.body.classList.remove('dark-mode');
-        }
+    // Listen for the checkbox change event
+    switchModeCheckbox.addEventListener('change', function() {
+        // Toggle dark mode class on the body element
+        document.body.classList.toggle('dark');
     });
     </script>
 

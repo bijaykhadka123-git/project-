@@ -1,15 +1,7 @@
 <?php
 session_start();
 
-// Check if the user clicked the logout link
-if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    // Destroy the session
-    session_destroy();
 
-    // Redirect the admin to the login page
-    header("Location: index.php");
-    exit();
-}
 
 $host = "localhost";
 $username = "root";

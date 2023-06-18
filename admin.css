@@ -95,76 +95,60 @@ th {
 /* Navbar Styles */
 
 
-/* Navbar Styles */
+/* Switch mode toggle styles */
+
+.navbar {
+    background-color: #f2f2f2;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
 .switch-mode {
     position: fixed;
     top: 30px;
-    right: 50px;
-    /* Adjust the position to make room for the notification */
+    right: 90px;
+    transform: translateY(-50%);
     z-index: 9999;
 }
 
-.switch-mode label {
+.switch-mode .slider {
+    position: relative;
     display: inline-block;
     width: 40px;
-    /* Adjusted width */
     height: 24px;
-    /* Adjusted height */
-    position: relative;
-}
-
-.switch-mode input {
-    display: none;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background-color: #ccc;
-    -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 24px;
-    /* Adjusted border-radius */
+    cursor: pointer;
 }
 
-.slider:before {
+.switch-mode .slider:before {
     position: absolute;
     content: "";
     height: 16px;
-    /* Adjusted height */
     width: 16px;
-    /* Adjusted width */
     left: 4px;
     bottom: 4px;
     background-color: #fff;
-    -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;
 }
 
-input:checked+.slider {
+.switch-mode input:checked+.slider {
     background-color: #2196f3;
 }
 
-input:checked+.slider:before {
-    -webkit-transform: translateX(16px);
-    /* Adjusted translateX */
-    -ms-transform: translateX(16px);
-    /* Adjusted translateX */
+.switch-mode input:checked+.slider:before {
     transform: translateX(16px);
-    /* Adjusted translateX */
 }
 
-.slider.round {
+.switch-mode .slider.round {
     border-radius: 34px;
 }
 
-.slider.round:before {
+.switch-mode .slider.round:before {
     border-radius: 50%;
 }
 
@@ -213,7 +197,7 @@ body.dark .message {
 }
 
 
-/* notitfication css */
+/* Notification styles */
 
 .notification {
     position: fixed;
@@ -223,19 +207,11 @@ body.dark .message {
     z-index: 9999;
 }
 
-.switch-mode {
-    position: fixed;
-    top: 30px;
-    right: 90px;
-    transform: translateY(-50%);
-    z-index: 9999;
-}
-
 .notification.active {
     background-color: #4caf50;
 }
 
-.notification-count {
+.notification .notification-count {
     position: absolute;
     top: -8px;
     right: -8px;
@@ -245,6 +221,23 @@ body.dark .message {
     padding: 2px 4px;
     border-radius: 50%;
 }
+
+
+/* Profile styles */
+
+.profile {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+
+/* Navbar Styles */
+
+
+/* Switch mode toggle styles */
 
 
 /* css for side bar */

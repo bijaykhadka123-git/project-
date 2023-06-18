@@ -6,8 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styleone.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+
 </head>
+
 
 <body>
     <div class="container">
@@ -41,12 +45,27 @@
                 </select>
             </div>
 
+
+
             <div class="form-group">
                 <button type="submit">Submit</button>
+                <button type="button" id="cancel-button" class="cancel-button">
+                    <i class="material-icons">close</i></button>
             </div>
-
             <p>Already have an account? <a href="login.php">Login here</a>.</p>
-        </form>
+    </div>
+
+
+    </form>
+    </div>
+
+    <script>
+    document.getElementById("cancel-button").addEventListener("click", function() {
+
+        window.location.href = "auth/index.html";
+    });
+    </script>
+    </form>
     </div>
 </body>
 

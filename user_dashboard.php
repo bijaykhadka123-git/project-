@@ -3,6 +3,7 @@ session_start();
 
 $is_invalid = false; // Initialize the variable as false
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $host = "localhost";
     $username = "root";
@@ -138,8 +139,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -227,10 +232,295 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
         text-align: center;
         margin-top: 20px;
     }
+
+    /* css for side bar */
+
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 220px;
+        background-color: #333;
+        color: #fff;
+        padding-top: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 20px;
+    }
+
+    .brand i {
+        margin-right: 10px;
+    }
+
+    .side-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .side-menu li {
+        margin-bottom: 15px;
+    }
+
+    .side-menu a {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        color: #fff;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .side-menu a:hover {
+        background-color: #555;
+    }
+
+    .side-menu i {
+        margin-right: 10px;
+    }
+
+    .text {
+        flex-grow: 1;
+    }
+
+    .active a {
+        background-color: #555;
+    }
+
+    .top {
+        margin-top: 60px;
+    }
+
+    .logout-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #f44336;
+        color: #fff;
+        text-decoration: none;
+        border: none;
+        border-radius: 2px;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background-color: #d32f2f;
+    }
+
+    /* Navbar Styles */
+
+
+    /* Switch mode toggle styles */
+
+    .navbar {
+        background-color: #f2f2f2;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .switch-mode {
+        position: fixed;
+        top: 30px;
+        right: 90px;
+        transform: translateY(-50%);
+        z-index: 9999;
+    }
+
+    .switch-mode .slider {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 24px;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+        cursor: pointer;
+    }
+
+    .switch-mode .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: #fff;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    .switch-mode input:checked+.slider {
+        background-color: #2196f3;
+    }
+
+    .switch-mode input:checked+.slider:before {
+        transform: translateX(16px);
+    }
+
+    .switch-mode .slider.round {
+        border-radius: 34px;
+    }
+
+    .switch-mode .slider.round:before {
+        border-radius: 50%;
+    }
+
+
+    /* Dark mode styles */
+
+    body.dark {
+        background-color: #222;
+        color: #fff;
+    }
+
+    body.dark .container {
+        background-color: #333;
+    }
+
+    body.dark th {
+        background-color: #444;
+    }
+
+    body.dark .btn-info {
+        background-color: #6fbf73;
+    }
+
+    body.dark .btn-primary {
+        background-color: #4d8ff2;
+    }
+
+    body.dark .btn-warning {
+        background-color: #ffa94d;
+    }
+
+    body.dark .btn-danger {
+        background-color: #f26868;
+    }
+
+    body.dark .logout-button {
+        background-color: #f26868;
+    }
+
+    body.dark .logout-button:hover {
+        background-color: #cf5959;
+    }
+
+    body.dark .message {
+        color: #fff;
+    }
+
+
+    /* Notification styles */
+
+    .notification {
+        position: fixed;
+        top: 30px;
+        right: 50px;
+        transform: translateY(-50%);
+        z-index: 9999;
+    }
+
+    .notification.active {
+        background-color: #4caf50;
+    }
+
+    .notification .notification-count {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: red;
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 4px;
+        border-radius: 50%;
+    }
+
+
+    /* Profile styles */
+
+    .profile {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+        text-decoration: none;
+        color: #333;
+    }
+
+
+    /* Navbar Styles */
     </style>
 </head>
 
 <body>
+    !-- Add the sidebar code here --!
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <i class='bx bxs-smile'></i>
+            <span class="text">userhub</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="#">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-doughnut-chart'></i>
+                    <span class="text">Analyst </span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Message</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-cog'></i>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="?action=logout">
+                    <i class='bx bxs-log-out-circle'></i>
+
+                    <span class="logout-button">Logout</span>
+
+                </a>
+            </li>
+        </ul>
+    </section>
+    <!-- End of sidebar code -->
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="switch-mode">
+            <input type="checkbox" id="switch-mode-checkbox" hidden>
+            <label for="switch-mode-checkbox" class="slider"></label>
+        </div>
+
+        <a href="#" class="notification">
+            <i class="bx bxs-bell"></i>
+            <span class="notification-count">8</span>
+        </a>
+    </nav>
+
+
+
+    <!-- NAVBAR -->
     <div class="dashboard-container">
         <h1>Welcome to e-library </h1>
         <table>
@@ -276,7 +566,17 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
         </table>
 
     </div>
-    <a class="logout-button" href="?action=logout">Logout</a>
+    <script>
+    // Get the switch mode checkbox element
+    const switchModeCheckbox = document.getElementById('switch-mode-checkbox');
+
+    // Listen for the checkbox change event
+    switchModeCheckbox.addEventListener('change', function() {
+        // Toggle dark mode class on the body element
+        document.body.classList.toggle('dark');
+    });
+    </script>
+
 </body>
 
 </html>

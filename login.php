@@ -1,7 +1,27 @@
 <?php
 session_start();
-
 $is_invalid = false; // Initialize the variable as false
+
+// Check if the user clicked the logout link
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    // Destroy the session
+    session_destroy();
+
+    // Redirect the user to the login page
+    header("Location: auth/login.php");
+    exit();
+}
+// Check if the user is already logged in
+if (isset($_SESSION["user_id"])) {
+    // Redirect the user to the appropriate dashboard based on the user role
+    if ($_SESSION["role"] === "admin") {
+        header("Location: admin_dashboard.php");
+        exit();
+    } else {
+        header("Location: user_dashboard.php");
+        exit();
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $host = "localhost";
@@ -29,10 +49,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Redirect the user to the appropriate dashboard based on the user role
                 if ($user["role"] === "admin") {
                     header("Location: admin_dashboard.php");
+                    exit();
                 } else {
                     header("Location: user_dashboard.php");
+                    exit();
                 }
-                exit();
             } else {
                 $is_invalid = true;
             }
@@ -97,14 +118,37 @@ if (isset($_GET['logout'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
     /* CSS for login page */
+
     .container {
         max-width: 400px;
         margin: 0 auto;
         padding: 20px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        position: relative;
+    }
+
+    .cancel-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        visibility: visible !important;
+        background: none;
+        border: none;
+        color: #000;
+    }
+
+
+
+    .cancel-button i {
+        font-size: 20px;
+    }
+
+    .cancel-button:hover {
+        color: red;
     }
 
     form {
@@ -126,6 +170,7 @@ if (isset($_GET['logout'])) {
         margin-bottom: 10px;
         border: 1px solid #ccc;
         border-radius: 3px;
+        width: 98%;
     }
 
     button {
@@ -137,11 +182,11 @@ if (isset($_GET['logout'])) {
         cursor: pointer;
     }
 
-    button:hover {
+    button[type=submit]:hover {
         background-color: #45a049;
     }
 
-    button:active {
+    button[type=submit]:active {
         background-color: #3e8e41;
     }
     </style>
@@ -153,14 +198,26 @@ if (isset($_GET['logout'])) {
         <em>Invalid login</em>
         <?php endif; ?>
         <form method="POST">
-            <h1>login</h1>
+            <h1>Login</h1>
             <label for="email">Email</label>
             <input type="email" id="email" name="email"
                 value="<?= isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "" ?>">
             <label for="password">Password</label>
             <input type="password" id="password" name="password">
-            <button>Login</button>
+            <button type="submit">Login</button>
         </form>
+
+        <button type="button" id="cancel-button" class="cancel-button">
+            <i class="material-icons">close</i>
+        </button>
+
+        <p>Not signed up yet? <a href="index.php">Sign up here</a>.</p>
+        <script>
+        document.getElementById("cancel-button").addEventListener("click", function() {
+
+            window.location.href = "auth/index.html";
+        });
+        </script>
     </div>
 </body>
 
