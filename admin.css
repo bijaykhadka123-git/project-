@@ -9,8 +9,10 @@ body {
 
 .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 100px auto 20px;
     padding: 20px;
+    position: relative;
+    top: 50px;
 }
 
 h1 {
@@ -92,21 +94,26 @@ th {
 }
 
 
-/* Navbar Styles */
-
-
-/* Switch mode toggle styles */
+/* navbar */
 
 .navbar {
     background-color: #f2f2f2;
-    padding: 10px;
+    padding: 20px 30px 25px 10px;
+    /* Increased padding */
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    height: 25px;
+    /* Increased navbar height */
 }
 
 .switch-mode {
-    position: fixed;
+    position: absolute;
     top: 30px;
     right: 90px;
     transform: translateY(-50%);
@@ -197,6 +204,69 @@ body.dark .message {
 }
 
 
+/* Search bar styles */
+
+.navbar .search-form {
+    position: absolute;
+    top: 40%;
+    right: 200px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.navbar .search-form #search-input {
+    padding: 5px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    width: 500px;
+    height: 20px;
+}
+
+.navbar .search-form #search-button {
+    padding: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+
+/* Cross button styles */
+
+.navbar .search-form .search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .search-form .search-wrapper input {
+    padding-right: 30px;
+}
+
+.navbar .search-form .search-wrapper .clear-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    padding: 5px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.navbar .search-form .search-wrapper .clear-button i {
+    color: #888;
+}
+
+.navbar .search-form .search-wrapper .clear-button.active {
+    display: block;
+}
+
+
 /* Notification styles */
 
 .notification {
@@ -223,36 +293,22 @@ body.dark .message {
 }
 
 
-/* Profile styles */
-
-.profile {
-    position: relative;
-    display: inline-block;
-    margin-right: 10px;
-    text-decoration: none;
-    color: #333;
-}
-
-
-/* Navbar Styles */
-
-
-/* Switch mode toggle styles */
-
-
-/* css for side bar */
+/* side bar */
 
 #sidebar {
     position: fixed;
-    top: 0;
+    /* Adjusted top position */
     left: 0;
     height: 100vh;
+    /* Adjusted height */
     width: 220px;
     background-color: #333;
     color: #fff;
     padding-top: 20px;
     box-sizing: border-box;
     overflow-y: auto;
+    z-index: 9999;
+    top: 0;
 }
 
 .brand {

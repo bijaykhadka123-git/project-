@@ -28,7 +28,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- Additional styles or scripts for the dashboard -->
     <style>
     .container {
         max-width: 400px;
@@ -99,20 +98,19 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 </head>
 
 <body>
-
     <!-- Dashboard content -->
     <?php
     $host = "localhost";
-$username = "root";
-$password = "";
-$database = "project";
+    $username = "root";
+    $password = "";
+    $database = "project";
 
-$conn = new mysqli($host, $username, $password, $database);
+    $conn = new mysqli($host, $username, $password, $database);
 
-if ($conn->connect_errno) {
-    die("Failed to connect to MySQL: " . $conn->connect_error);
-}
-    
+    if ($conn->connect_errno) {
+        die("Failed to connect to MySQL: " . $conn->connect_error);
+    }
+
     // Check if file is uploaded
     if (isset($_POST['submit'])) {
         $targetDir = "uploads/";
@@ -128,30 +126,40 @@ if ($conn->connect_errno) {
                 $filename = $_FILES["pdfFile"]["name"];
                 $folder_path = $targetDir;
                 $time_stamp = date('Y-m-d H:i:s');
-                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp) VALUES ('$filename', '$folder_path', '$time_stamp')";
+
+                // Retrieve keywords from the form data
+                $keywords = $_POST["keywords"];
+
+                // Insert the filename, folder path, timestamp, and keywords into the database
+                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp, keywords) VALUES ('$filename', '$folder_path', '$time_stamp', '$keywords')";
                 if ($conn->query($sql) === TRUE) {
                     echo '<script>alert("File uploaded successfully.");</script>';
                 } else {
-                  echo "Error: " . $sql . "<br>" . $conn->error;
-
+                    echo "Error: " . $sql . "<br>" . $conn->error;
                 }
             } else {
                 echo "Error uploading file.";
             }
         }
     }
-    // close database conn
+    // Close database connection
     $conn->close();
     ?>
+
     <div class="container">
-        <h1>upload pdf file here</h1>
+        <h1>Upload PDF file here</h1>
         <form method="POST" enctype="multipart/form-data">
             <label for="pdfFile">Choose a PDF file:</label>
             <input type="file" id="pdfFile" name="pdfFile" required>
-            <input type="submit" name="submit" value="Upload">
-            <button class="btn" name="btn"> reset</button>
-            <button class="btn1"><a href="admin_dashboard.php"> more</a></button>
 
+            <!-- Add input field or textarea for keywords -->
+            <label for="keywords">Keywords:</label>
+            <input type="text" id="keywords" name="keywords" placeholder="Enter keywords separated by commas" required>
+            <br><br>
+
+            <input type="submit" name="submit" value="Upload">
+            <button class="btn" name="btn">Reset</button>
+            <button class="btn1"><a href="admin_dashboard.php">More</a></button>
         </form>
     </div>
 

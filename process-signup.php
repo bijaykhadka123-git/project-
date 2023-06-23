@@ -1,37 +1,43 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST)) {
-        die("Name is required");
+        echo '<script>alert("Name is required");</script>';
+        die();
     }
 
     if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
-        die("Valid email is required");
+        echo '<script>alert("Valid email is required");</script>';
+        die();
     }
 
     if (strlen($_POST["password"]) < 8) {
-        die("Password should be at least 8 characters");
+        echo '<script>alert("Password should be at least 8 characters");</script>';
+        die();
     }
 
     if (!preg_match("/[a-z]/i", $_POST["password"])) {
-        die("Password must contain at least one letter");
+        echo '<script>alert("Password must contain at least one letter");</script>';
+        die();
     }
 
     if (!preg_match("/[0-9]/", $_POST["password"])) {
-        die("Password must contain at least one number");
+        echo '<script>alert("Password must contain at least one number");</script>';
+        die();
     }
 
     if ($_POST["password"] !== $_POST["repeat_password"]) {
-        die("Passwords must match");
+        echo '<script>alert("Passwords must match");</script>';
+        die();
     }
 
     // Check if the email address is allowed for the admin role
     $allowedAdminEmails = ["admin1@example.com", "admin2@example.com"];
     $email = $_POST["email"];
     if ($_POST["role"] === "admin" && !in_array($email, $allowedAdminEmails)) {
-        die("Email address not allowed for the admin role");
+        echo '<script>alert("Email address not allowed for the admin role");</script>';
+        die();
     }
 
-    
     $hashed_password = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
     // Debug: Display hashed password
@@ -58,7 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     } else {
         if ($mysqli->errno === 1062) {
-            die("Email is already taken");
+            echo '<script>alert("Email is already taken");</script>';
+            die();
         } else {
             die($mysqli->error . " " . $mysqli->errno);
         }

@@ -194,7 +194,7 @@ if (isset($_GET['id'])) {
         ?>
 
         <p>
-            <a href="download.php">Back to File List</a>
+            <a href="admin_dashboard.php">Back to File List</a>
         </p>
     </div>
 </body>
