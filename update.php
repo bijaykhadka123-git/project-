@@ -1,43 +1,20 @@
 <?php
 session_start();
 
-
-
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "project";
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_errno) {
-    die("Failed to connect to MySQL: " . $conn->connect_error);
-}
+include_once 'database2.php';
 
 // Check if the form is submitted for update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['id']) && isset($_POST['filename'])) {
+    if (isset($_POST['id']) && isset($_POST['title'])) {
         $id = $_POST['id'];
-        $filename = $_POST['filename'];
+        $title = $_POST['title'];
 
-        // Retrieve the old filename from the database
-        $filenameQuery = "SELECT filename FROM pdf WHERE id='$id'";
-        $filenameResult = $conn->query($filenameQuery);
-        $oldFilename = $filenameResult->fetch_assoc()['filename'];
-
-        // Update the file name in the database
-        $updateQuery = "UPDATE pdf SET filename='$filename' WHERE id='$id'";
+        // Update the title in the database
+        $updateQuery = "UPDATE pdf SET title='$title' WHERE id='$id'";
         if ($conn->query($updateQuery) === TRUE) {
-            // Rename the file on the server
-            $oldFilePath = "uploads/" . $oldFilename;
-            $newFilePath = "uploads/" . $filename;
-            if (rename($oldFilePath, $newFilePath)) {
-                echo "File name updated successfully!";
-            } else {
-                echo "Error updating file name on the server.";
-            }
+            echo "Title updated successfully!";
         } else {
-            echo "Error updating file name: " . $conn->error;
+            echo "Error updating title: " . $conn->error;
         }
     } else {
         echo "Invalid request.";
@@ -54,37 +31,49 @@ if (isset($_GET['id'])) {
     if ($fileResult->num_rows > 0) {
         $file = $fileResult->fetch_assoc();
 
-        // Retrieve the file path
-        $filepath = "uploads/" . $file['filename'];
-
         // Check if the file exists
-        if (file_exists($filepath)) {
+        if (isset($file['title'])) {
             // Serve the file for download
             if (isset($_GET['download'])) {
-                header("Content-Type: application/pdf");
-                header("Content-Disposition: attachment; filename=" . $file['filename']);
-                readfile($filepath);
-                exit;
+                $filepath = "uploads/" . $file['title'];
+                if (file_exists($filepath)) {
+                    header("Content-Type: application/pdf");
+                    header("Content-Disposition: attachment; filename=" . $file['title']);
+                    readfile($filepath);
+                    exit;
+                } else {
+                    echo "File not found.";
+                }
             }
 
             // Display the file content for viewing
             if (isset($_GET['view'])) {
-                header("Content-Type: application/pdf");
-                readfile($filepath);
-                exit;
+                $filepath = "uploads/" . $file['title'];
+                if (file_exists($filepath)) {
+                    header("Content-Type: application/pdf");
+                    readfile($filepath);
+                    exit;
+                } else {
+                    echo "File not found.";
+                }
             }
 
             // Delete the file
             if (isset($_GET['delete'])) {
-                // Remove the file from the server
-                unlink($filepath);
+                $filepath = "uploads/" . $file['title'];
+                if (file_exists($filepath)) {
+                    // Remove the file from the server
+                    unlink($filepath);
 
-                // Delete the file record from the database
-                $deleteQuery = "DELETE FROM pdf WHERE id='$id'";
-                if ($conn->query($deleteQuery) === TRUE) {
-                    echo "File deleted successfully!";
+                    // Delete the file record from the database
+                    $deleteQuery = "DELETE FROM pdf WHERE id='$id'";
+                    if ($conn->query($deleteQuery) === TRUE) {
+                        echo "File deleted successfully!";
+                    } else {
+                        echo "Error deleting file: " . $conn->error;
+                    }
                 } else {
-                    echo "Error deleting file: " . $conn->error;
+                    echo "File not found.";
                 }
             }
         } else {
@@ -116,7 +105,6 @@ if (isset($_GET['id'])) {
 
     h1 {
         margin-top: 0;
-
         color: #45a049;
         text-align: center;
     }
@@ -151,7 +139,6 @@ if (isset($_GET['id'])) {
     a {
         color: #1e90ff;
         text-decoration: none;
-
     }
 
     a:hover {
@@ -176,13 +163,11 @@ if (isset($_GET['id'])) {
                 $file = $fileResult->fetch_assoc();
                 ?>
 
-
         <form method="POST" action="">
             <input type="hidden" name="id" value="<?php echo $file['id']; ?>">
-            <input type="text" name="filename" value="<?php echo $file['filename']; ?>">
+            <input type="text" name="title" value="<?php echo $file['title']; ?>">
             <input type="submit" value="Update">
         </form>
-
 
         <?php
             } else {

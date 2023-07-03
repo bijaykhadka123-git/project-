@@ -111,8 +111,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         die("Failed to connect to MySQL: " . $conn->connect_error);
     }
 
-    // Check if file is uploaded
-    if (isset($_POST['submit'])) {
+    // Handle file upload
+    if (isset($_FILES['pdfFile'])) {
         $targetDir = "uploads/";
         $targetFile = $targetDir . basename($_FILES["pdfFile"]["name"]);
         $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
@@ -121,17 +121,22 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
         if ($fileType != "pdf" || $_FILES["pdfFile"]["size"] > 1000000000) {
             echo "Error: Only files less than 1GB can be uploaded.";
         } else {
+            // Generate a unique file name using a timestamp
+            $timestamp = time();
+            $filename = $timestamp . '_' . $_FILES["pdfFile"]["name"];
+            $targetFilePath = $targetDir . $filename;
+
             // Move uploaded file into upload folder
-            if (move_uploaded_file($_FILES["pdfFile"]["tmp_name"], $targetFile)) {
-                $filename = $_FILES["pdfFile"]["name"];
+            if (move_uploaded_file($_FILES["pdfFile"]["tmp_name"], $targetFilePath)) {
                 $folder_path = $targetDir;
                 $time_stamp = date('Y-m-d H:i:s');
 
                 // Retrieve keywords from the form data
                 $keywords = $_POST["keywords"];
+                $title = $_POST["title"];
 
                 // Insert the filename, folder path, timestamp, and keywords into the database
-                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp, keywords) VALUES ('$filename', '$folder_path', '$time_stamp', '$keywords')";
+                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp, keywords, title) VALUES ('$filename', '$folder_path', '$time_stamp', '$keywords', '$title')";
                 if ($conn->query($sql) === TRUE) {
                     echo '<script>alert("File uploaded successfully.");</script>';
                 } else {
@@ -155,6 +160,9 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             <!-- Add input field or textarea for keywords -->
             <label for="keywords">Keywords:</label>
             <input type="text" id="keywords" name="keywords" placeholder="Enter keywords separated by commas" required>
+            <br>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
             <br><br>
 
             <input type="submit" name="submit" value="Upload">

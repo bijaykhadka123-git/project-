@@ -105,28 +105,47 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     exit();
 }
 
-include 'database2.php';
+// Step 2: Retrieve the user information from the database
+$userId = $_SESSION["user_id"]; // Assuming you have the user ID stored in a session variable
 
-// Handle search functionality
-if (isset($_GET['search'])) {
-    $searchQuery = $_GET['search'];
-    $searchQuery = $conn->real_escape_string($searchQuery); // Sanitize the search query
+// Prepare the statement
+$userSql = "SELECT * FROM users WHERE id = ?";
+$stmt = $mysqli->prepare($userSql);
 
-    // Search by matching keywords
-    $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$searchQuery%'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows === 0) {
-        $message = "No records found.";
-    }
-} else {
-    // Retrieve all records if no search query is present
-    $sql = "SELECT * FROM pdf";
-    $result = $conn->query($sql);
+if (!$stmt) {
+    die("Failed to prepare user query: " . $mysqli->error);
 }
 
-?>
+// Bind the user ID parameter
+$stmt->bind_param("s", $userId);
 
+// Execute the query
+$stmt->execute();
+
+// Get the result
+$userResult = $stmt->get_result();
+
+if (!$userResult || $userResult->num_rows == 0) {
+    die("User not found");
+}
+
+$user = $userResult->fetch_assoc();
+
+// Step 3: Define the action and timestamp
+$loginAction = "Logged in";
+$loginTime = date("Y-m-d H:i:s");
+
+// Step 4: Insert the login history into the database
+$insertSql = "INSERT INTO login_history (user_id, action, timestamp) VALUES ('{$user['id']}', '$loginAction', '$loginTime')";
+$insertResult = $mysqli->query($insertSql);
+
+if (!$insertResult) {
+    die("Failed to insert login history: " . $mysqli->error);
+}
+// Step 5: Close the database connection
+$mysqli->close();
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -138,90 +157,131 @@ if (isset($_GET['search'])) {
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="userdash.css">
+    <style>
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+
+    .file-container {
+        width: 25%;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #ccc;
+        display: inline-block;
+        margin: 20px;
+        height: 200px;
+        overflow: hidden;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-count {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .file-options {
+        margin-top: 10px;
+    }
+
+    .view-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: red;
+        color: white;
+        text-decoration: none;
+        margin-right: 5px;
+
+    }
+
+    .download-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #ff9800;
+        color: white;
+        text-decoration: none;
+        margin-right: 5px;
+
+    }
+
+    .view-button:hover {
+        background-color: #0056b3;
+    }
+
+    .download-button:hover {
+        background-color: #0056b3;
+    }
+
+    #sidebarContainer {
+        flex: 0 0 200px;
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%);
+        /* Start with the sidebar hidden */
+    }
+
+    #sidebarContainer.active {
+        transform: translateX(0%);
+        /* Show the sidebar by moving it back to 0% */
+    }
+    </style>
 </head>
 
 <body>
-    <!-- Add the sidebar code here -->
-    <section id="sidebar">
-        <a href="#" class="brand">
-            <i class='bx bxs-smile'></i>
-            <span class="text">userhub</span>
-        </a>
-        <ul class="side-menu top">
-            <li class="active">
-                <a href="#">
-                    <i class='bx bxs-dashboard'></i>
-                    <span class="text">Dashboard</span>
+    <div id="container">
+        <div id="sidebarContainer" class="inactive">
+            <!-- Add the sidebar code here -->
+            <section id="sidebar" class="sidebar">
+                <a href="#" class="brand">
+                    <i class='bx bxs-smile'></i>
+                    <span class="text">userhub</span>
                 </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-doughnut-chart'></i>
-                    <span class="text">Analyst </span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-cog'></i>
-                    <span class="text">Settings</span>
-                </a>
-            </li>
-            <li>
-                <a href="?action=logout">
-                    <i class='bx bxs-log-out-circle'></i>
-                    <span class="logout-button">Logout</span>
-                </a>
-            </li>
-        </ul>
-    </section>
+                <ul class="side-menu top">
+                    <li class="active">
+                        <a href="user_dashboard.php">
+                            <i class='bx bxs-dashboard'></i>
+                            <span class="text">elibrary</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.php">
+                            <i class='bx bxs-user profile-icon'></i>
+                            <span class="text">profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class='bx bxs-message-dots'></i>
+                            <span class="text">Message</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class='bx bxs-cog'></i>
+                            <span class="text">Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?action=logout">
+                            <i class='bx bxs-log-out-circle'></i>
+                            <span class="logout-button">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </div>
 
-    <body>
+
         <!-- Add the sidebar code here -->
-        <section id="sidebar">
-            <a href="#" class="brand">
-                <i class='bx bxs-smile'></i>
-                <span class="text">AdminHub</span>
-            </a>
-            <ul class="side-menu top">
-                <li class="active">
-                    <a href="#">
-                        <i class='bx bxs-dashboard'></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class='bx bxs-doughnut-chart'></i>
-                        <span class="text">history </span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class='bx bxs-message-dots'></i>
-                        <span class="text">Message</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class='bx bxs-cog'></i>
-                        <span class="text">Settings</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="?action=logout">
-                        <i class='bx bxs-log-out-circle'></i>
-                        <span class="logout-button">Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </section>
-        <!-- End of sidebar code -->
+
         <nav id="navbar" class="navbar">
             <div class="switch-mode">
                 <input type="checkbox" id="switch-mode-checkbox" hidden>
@@ -239,6 +299,13 @@ if (isset($_GET['search'])) {
                 <i class="bx bxs-bell"></i>
                 <span class="notification-count">8</span>
             </a>
+            <a href="#" class="profile">
+                <div class="profile">
+                    <img src="auth/img/library.jpg" alt="Profile Picture" class="profile-picture">
+
+                </div>
+            </a>
+
         </nav>
 
         <!-- NAVBAR -->
@@ -246,96 +313,69 @@ if (isset($_GET['search'])) {
         <!-- NAVBAR -->
         <div class="dashboard-container">
             <h1>Welcome to e-library </h1>
-            <table>
-                <tr>
-                    <th>No.</th>
-                    <th>File Name</th>
-                    <th>Actions</th>
-                </tr>
-                <?php
+
+            <?php
         
-            
             // Display the list of available PDF files based on search keyword
-            $host = "localhost";
-            $username = "root";
-            $password = "";
-            $database = "project";
+include 'database2.php';
+if (isset($_GET['search'])) {
+    $keyword = $conn->real_escape_string($_GET['search']);
 
-            $conn = new mysqli($host, $username, $password, $database);
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
+    if (trim($keyword) !== '') { // Check if the keyword is not empty after trimming
+        $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$keyword,%'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $count = 1; // Initialize the count variable
+            while ($row = $result->fetch_assoc()) {
+                echo "<div class='file-container'>";
+                echo "<span class='file-count'>" . $count . "</span>";
+                echo "<h3>" . $row['title'] . "</h3>";
+                echo "<div class='file-options'>";
+                echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
+                echo "<a class='view-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
+                echo "</div>";
+                echo "</div>";
+                $count++;
             }
+        } else {
+            echo "<div class='no-files'>No files found for the specified keyword.</div>";
+        }
+    } else {
+        echo "<div class='no-files'>Please fill the query in the search bar.</div>";
+    }
+} else {
+    $sql = "SELECT * FROM pdf ORDER BY time_stamp DESC LIMIT 8";
+    $result = $conn->query($sql);
 
-            if (isset($_GET['search'])) {
-                $keyword = $conn->real_escape_string($_GET['search']);
+    if ($result->num_rows > 0) {
+        $count = 1; // Initialize the count variable
+        while ($row = $result->fetch_assoc()) {
+            echo "<div class='file-container'>";
+            echo "<span class='file-count'>" . $count . "</span>";
+            echo "<h3>" . $row['title'] . "</h3>";
+            echo "<div class='file-options'>";
+            echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
+            echo "<a class='download-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
+            echo "</div>";
+            echo "</div>";
+            $count++;
+        }
+    } else {
+        echo "<div class='no-files'>No files available.</div>";
+    }
+}
 
-                $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$keyword%'";
-                $result = $conn->query($sql);
+$conn->close();
+?>
 
-                if ($result->num_rows > 0) {
-                    $count = 1; // Initialize the count variable
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $count . "</td>";
-                        echo "<td>" . $row['filename'] . "</td>";
-                        echo "<td>";
-                        echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
-                        echo "<a class='view-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
-                        echo "</td>";
-                        echo "</tr>";
-                        $count++;
-                    }
-                } else {
-                    echo "<tr><td colspan='3'>No files found for the specified keyword.</td></tr>";
-                }
-            } else {
-                $sql = "SELECT * FROM pdf";
-                $result = $conn->query($sql);
 
-                if ($result->num_rows > 0) {
-                    $count = 1; // Initialize the count variable
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $count . "</td>";
-                        echo "<td>" . $row['filename'] . "</td>";
-                        echo "<td>";
-                        echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
-                        echo "<a class='view-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
-                        echo "</td>";
-                        echo "</tr>";
-                        $count++;
-                    }
-                } else {
-                    echo "<tr><td colspan='3'>No files available.</td></tr>";
-                }
-            }
-
-            $conn->close();
-            ?>
         </div>
-        <script>
-        // Get the switch mode checkbox element
-        const switchModeCheckbox = document.getElementById('switch-mode-checkbox');
+        <script src="user.js
+        ">
 
-        // Listen for the checkbox change event
-        switchModeCheckbox.addEventListener('change', function() {
-            // Toggle dark mode class on the body element
-            document.body.classList.toggle('dark');
-        });
-        const searchButton = document.getElementById('search-button');
-        const searchInput = document.getElementById('search-input');
-        const searchClearButton = document.getElementById('search-clear-button');
-
-        searchButton.addEventListener('click', function() {
-            if (searchInput.value.trim() !== '') {
-                document.getElementById('search-form').submit();
-            }
-        });
-
-        searchClearButton.addEventListener('click', function() {
-            searchInput.value = '';
-        });
         </script>
-    </body>
+    </div>
+</body>
 
 </html>

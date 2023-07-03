@@ -25,7 +25,7 @@ if (isset($_GET['search'])) {
     $searchQuery = $conn->real_escape_string($searchQuery); // Sanitize the search query
 
     // Search by matching keywords
-    $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$searchQuery%'";
+    $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$searchQuery,%'";
     $result = $conn->query($sql);
 
     if ($result->num_rows === 0) {
@@ -91,7 +91,7 @@ if (isset($_GET['download'])) {
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="log_history.php">
                     <i class='bx bxs-doughnut-chart'></i>
                     <span class="text">history </span>
                 </a>
@@ -131,12 +131,23 @@ if (isset($_GET['download'])) {
             </div>
             <button type="submit" id="search-button"><i class="fa fa-search"></i></button>
         </form>
-        <a href="#" class="notification">
-            <i class="bx bxs-bell"></i>
-            <span class="notification-count">8</span>
-        </a>
+
+        <body>
+            <!-- Rest of the code -->
+
+            <!-- Add a notification container -->
+            <div id="notification-container">
+
+                <!-- Rest of the code -->
+
+
+                <a href="#" class="notification">
+                    <i class="bx bxs-bell"></i>
+                    <span class="notification-count">8</span>
+                </a>
+
     </nav>
-    s
+
 
 
 
@@ -161,7 +172,7 @@ if (isset($_GET['download'])) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . $count . "</td>";
-                    echo "<td>" . $row['filename'] . "</td>";
+                    echo "<td>" . $row['title'] . "</td>";
                     echo '<td>
                     
                             <a href="?download=' . $row['filename'] . '" class="btn btn-info">Download</a>
