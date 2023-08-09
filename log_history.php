@@ -3,14 +3,27 @@
 session_start();
 
 include 'database.php';
-// Step 3: Retrieve login history from the table
-$historySql = "SELECT * FROM login_history";
+// Step 3: Retrieve login history with user names from the table
+$historySql = "SELECT lh.*, u.name FROM login_history lh
+               INNER JOIN users u ON lh.user_id = u.id";
 $historyResult = $mysqli->query($historySql);
 
 if (!$historyResult) {
     die("Failed to retrieve login history: " . $mysqli->error);
 }
 
+// Step 4: Group the login history by user ID using an associative array
+$loginHistoryByUser = array();
+while ($row = $historyResult->fetch_assoc()) {
+    $userID = $row["user_id"];
+    if (!isset($loginHistoryByUser[$userID])) {
+        $loginHistoryByUser[$userID] = array(
+            "user_name" => $row["name"],
+            "history" => array()
+        );
+    }
+    $loginHistoryByUser[$userID]["history"][] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -52,35 +65,38 @@ if (!$historyResult) {
         background-color: #f2f2f2;
     }
     </style>
-    </style>
 </head>
 
 <body>
 
-    <p>total number of users:
-        <?php echo $historyResult->num_rows; ?></p>
+    <p>Total number of users: <?php echo count($loginHistoryByUser); ?></p>
     <h2>Login History</h2>
-    <?php if ($historyResult->num_rows > 0): ?>
+    <?php if (count($loginHistoryByUser) > 0): ?>
+    <?php foreach ($loginHistoryByUser as $userID => $userData): ?>
+    <h3>User ID: <?php echo $userID; ?> </h3>
     <table>
         <tr>
-            <th>User ID</th>
             <th>Action</th>
             <th>Timestamp</th>
+            <th>username</th>
         </tr>
-        <?php while ($row = $historyResult->fetch_assoc()): ?>
+        <?php
+                $latestLoginHistory = array_slice($userData["history"], 0, 5);
+                foreach ($latestLoginHistory as $row): ?>
         <tr>
-            <td><?php echo $row["user_id"]; ?></td>
             <td><?php echo $row["action"]; ?></td>
             <td><?php echo $row["timestamp"]; ?></td>
+            <td><?php echo $userData["user_name"]; ?></td>
         </tr>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </table>
+    <?php endforeach; ?>
     <?php else: ?>
     <p>No login history found.</p>
     <?php endif; ?>
 
     <?php
-    // Step 4: Close the database connection
+    // Step 5: Close the database connection
     $mysqli->close();
     ?>
 </body>

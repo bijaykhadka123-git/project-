@@ -11,15 +11,14 @@
         justify-content: flex-start;
     }
 
-
     .file-container {
-        width: 25%;
+        width: 20%;
         box-sizing: border-box;
         padding: 10px;
         border: 1px solid #ccc;
         display: inline-block;
         margin: 20px;
-        height: 200px;
+        height: 250px;
         overflow: hidden;
         background-color: #f9f9f9;
         border-radius: 5px;
@@ -32,39 +31,49 @@
     }
 
     h1 {
-        margin: 0;
-        font-size: 30px;
         text-align: center;
+        font-family: 'Courier New', Courier, monospace;
+        color: blue;
+    }
+
+    h3 {
+        margin: 10px 0;
+        font-size: 18px;
+    }
+
+    .default-photo {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 5px 5px 0 0;
     }
 
     .file-options {
-        margin-top: 10px;
+        display: flex;
+        justify-content: center;
     }
 
-    .view-button {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: red;
-        color: white;
-        text-decoration: none;
-        margin-right: 5px;
-
-    }
-
+    .view-button,
     .download-button {
         display: inline-block;
         padding: 5px 10px;
-        background-color: #ff9800;
         color: white;
         text-decoration: none;
         margin-right: 5px;
-
+        margin-top: 10px;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
-    .view-button:hover {
-        background-color: #0056b3;
+    .view-button {
+        background-color: red;
     }
 
+    .download-button {
+        background-color: #ff9800;
+    }
+
+    .view-button:hover,
     .download-button:hover {
         background-color: #0056b3;
     }
@@ -90,6 +99,7 @@
             echo "<div class='file-container'>";
             echo "<span class='file-count'>" . $count . "</span>";
             echo "<h3>" . $row['title'] . "</h3>";
+            echo "<img src='uploads/xyz.jpg' alt='Default Photo' class='default-photo'>";
             echo "<div class='file-options'>";
             echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
             echo "<a class='download-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";

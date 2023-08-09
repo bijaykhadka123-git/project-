@@ -10,7 +10,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="styling.css" />
     <style>
-
+        .features-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            margin-left: 200px;
+        }
+        
+        h2 {
+            text-align: center;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .features-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .features-list i {
+            font-size: 24px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -29,7 +60,7 @@
                 <a href="#">blog</a>
             </li>
             <li>
-                <a href="#">feature</a>
+                <a href="#features">feature</a>
             </li>
             <li>
                 <a href="#">about us</a>
@@ -86,6 +117,30 @@
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque lacinia erat quis metus placerat, non posuere sem malesuada. Donec id tincidunt ligula. Nulla facilisi.
             </p>
         </aside>
+        <div id="features">
+            <section class="features-container">
+
+                <h2>Features</h2>
+                <ul class="features-list">
+                    <li>
+                        <i class="fa fa-book"></i> Extensive Collection: Access a vast collection of digital books and resources from various genres and subjects.
+                    </li>
+                    <li>
+                        <i class="fa fa-laptop"></i> Online Reading: Read books and materials directly within the web application, making learning convenient and accessible.
+                    </li>
+                    <li>
+                        <i class="fa fa-search"></i> Advanced Search: Easily find specific books using a powerful search functionality, including filters and keywords.
+                    </li>
+                    <li>
+                        <i class="fa fa-user"></i> Personalized Accounts: Create and manage your own user account to search books.
+                    </li>
+                    <li>
+                        <i class="fa fa-download"></i> Offline Access: Download books for offline reading, ensuring uninterrupted learning even without an internet connection.
+                    </li>
+
+                </ul>
+            </section>
+        </div>
     </main>
     <!---blog end-->
 

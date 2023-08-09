@@ -32,21 +32,16 @@
      const sidebarContainer = document.getElementById("sidebarContainer");
      sidebarContainer.classList.toggle("active");
  }
+ //when click a recent search keyword display the result
 
 
- // Add this function to display the notification
- function showNotification(message) {
-     // Create a notification element
-     var notification = document.createElement('div');
-     notification.className = 'notification';
-     notification.textContent = message;
+ const recentSearchesContainer = document.getElementById('recentSearchesContainer');
+ const recentSearchButtons = document.querySelectorAll('.recent-search-btn');
 
-     // Append the notification to the container
-     var container = document.getElementById('notification-container');
-     container.appendChild(notification);
-
-     // Remove the notification after a certain time (e.g., 5 seconds)
-     setTimeout(function() {
-         container.removeChild(notification);
-     }, 5000);
- }
+ // Add click event listeners to each recent search button
+ recentSearchButtons.forEach(button => {
+     button.addEventListener('click', function() {
+         // Display the recent searches container when any of the buttons is clicked
+         recentSearchesContainer.style.display = 'block';
+     });
+ });
