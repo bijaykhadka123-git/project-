@@ -9,7 +9,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="styling.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        /* for feature */
+        
         .features-container {
             max-width: 800px;
             margin: 0 auto;
@@ -49,30 +52,31 @@
     <nav>
         <input type="checkbox" id="check" />
         <label for="check" class="checkbtn">
-        <i class="fa fa-bars"></i>
-      </label>
+            <i class="fa fa-bars"></i>
+        </label>
         <label class="logo">E-library</label>
         <ul>
             <li>
                 <a href="#home">home</a>
             </li>
             <li>
-                <a href="#">blog</a>
+                <a href="../learnmore.php">blog</a>
             </li>
             <li>
                 <a href="#features">feature</a>
             </li>
             <li>
-                <a href="#">about us</a>
+                <a href="#about">about us</a>
             </li>
             <li>
-                <a href="../index.php">signup</button> </a>
+                <a href="../index.php" id="signup-link">signup</button> </a>
             </li>
             <li>
-                <a href="../login.php">login</button> </a>
+                <a href="../login.php" id="login-link">login</button> </a>
             </li>
         </ul>
 
+        <div id="dashboard-content"></div>
     </nav>
     <img src="img/elibrary.png" class="img1" />
     <!-- home section-->
@@ -102,21 +106,25 @@
             <h2>E-library</h2>
             <img src="img/library.jpg" alt="Blog Image">
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque lacinia erat quis metus placerat, non posuere sem malesuada. Donec id tincidunt ligula. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis
-                egestas.
+
             </p>
             <p>
-                Mauris sed bibendum nisi, sed euismod eros. Praesent sed magna nec tellus auctor viverra ac ac dolor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer ullamcorper tincidunt leo. Etiam sit amet lectus ullamcorper,
-                ultrices arcu ut, viverra turpis. Curabitur in justo eu risus pretium tempus.
+                An electronic library, often referred to as an e-library, is a digital platform that offers access to a vast collection of resources such as books, journals, articles, magazines, research papers, and other types of documents. Unlike traditional libraries
+                that house physical copies of materials, e-libraries provide users with the convenience of accessing information electronically from the comfort of their own devices.
             </p>
         </article>
 
         <aside>
-            <h3>About Me</h3>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque lacinia erat quis metus placerat, non posuere sem malesuada. Donec id tincidunt ligula. Nulla facilisi.
-            </p>
+            <div id="about">
+                <h3>About Me</h3>
+                <p>
+                    "Hello there! I'm a living embodiment of a library, a repository of diverse experiences and knowledge. Just as a library houses a vast collection of books and resources, I hold a treasury of memories, insights, and skills. Each 'shelf' of my life is lined
+                    with chapters from my personal journey,and every 'book' tells a unique story about who I am.
+                </p>
+            </div>
         </aside>
+        </div>
+
         <div id="features">
             <section class="features-container">
 
@@ -206,5 +214,6 @@
 
     </footer>
 </body>
+
 
 </html>

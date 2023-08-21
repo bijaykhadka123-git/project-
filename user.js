@@ -32,16 +32,3 @@
      const sidebarContainer = document.getElementById("sidebarContainer");
      sidebarContainer.classList.toggle("active");
  }
- //when click a recent search keyword display the result
-
-
- const recentSearchesContainer = document.getElementById('recentSearchesContainer');
- const recentSearchButtons = document.querySelectorAll('.recent-search-btn');
-
- // Add click event listeners to each recent search button
- recentSearchButtons.forEach(button => {
-     button.addEventListener('click', function() {
-         // Display the recent searches container when any of the buttons is clicked
-         recentSearchesContainer.style.display = 'block';
-     });
- });

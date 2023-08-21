@@ -3,8 +3,7 @@ session_start();
 
 // Check if the user clicked the logout link
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    // Destroy the session
-    session_destroy();
+     session_destroy();
 
     // Redirect the admin to the login page
     header("Location: auth/index.html");
@@ -13,29 +12,41 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
 // Check if the user is not logged in
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
-    // Redirect the user to the login page
     header("Location: login.php");
     exit();
 }
 
 include 'database2.php';
-// Handle search functionality
+$result = null;
+
+ // Handle search functionality with keyword and category filter
 if (isset($_GET['search'])) {
     $searchQuery = $_GET['search'];
+    $categoryFilter = $_GET['category']; // Get the selected category from the dropdown
     $searchQuery = $conn->real_escape_string($searchQuery); // Sanitize the search query
 
-    // Search by matching keywords
-    $sql = "SELECT * FROM pdf WHERE keywords LIKE '%$searchQuery,%'";
+    $sql = "SELECT * FROM pdf WHERE 1"; // Initialize the base query
+
+    if (!empty($searchQuery)) {
+        $sql .= " AND keywords LIKE '%$searchQuery%'";
+    }
+
+    if (!empty($categoryFilter)) {
+        $sql .= " AND category = '$categoryFilter'";
+    }
+
     $result = $conn->query($sql);
 
     if ($result->num_rows === 0) {
         $message = "No records found.";
     }
 } else {
-    // Retrieve all records if no search query is present
-    $sql = "SELECT * FROM pdf";
+    
+   
+  $sql = "SELECT * FROM pdf";
     $result = $conn->query($sql);
 }
+
 
 
 // Check if the file download is requested
@@ -97,17 +108,12 @@ if (isset($_GET['download'])) {
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="adminfeedback.php">
                     <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
+                    <span class="text">feedback</span>
                 </a>
             </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-cog'></i>
-                    <span class="text">Settings</span>
-                </a>
-            </li>
+
             <li>
                 <a href="?action=logout">
                     <i class='bx bxs-log-out-circle'></i>
@@ -127,31 +133,17 @@ if (isset($_GET['download'])) {
         <form id="search-form" action="#" method="GET" class="search-form">
             <div class="search-wrapper">
                 <input type="text" id="search-input" name="search" placeholder="Search..." />
+                <select id="category-select" name="category">
+                    <option value="">All Categories</option>
+                    <option value="category1">Category 1</option>
+                    <option value="category2">Category 2</option>
+
+                </select>
                 <button type="button" id="search-clear-button" class="clear-button"><i class="fa fa-times"></i></button>
             </div>
             <button type="submit" id="search-button"><i class="fa fa-search"></i></button>
         </form>
-
-        <body>
-            <!-- Rest of the code -->
-
-            <!-- Add a notification container -->
-            <div id="notification-container">
-
-                <!-- Rest of the code -->
-
-
-                <a href="#" class="notification">
-                    <i class="bx bxs-bell"></i>
-                    <span class="notification-count">8</span>
-                </a>
-
     </nav>
-
-
-
-
-
     <!-- NAVBAR -->
 
     <div class="container">
@@ -168,7 +160,7 @@ if (isset($_GET['download'])) {
             </tr>
             <?php
             $count = 1;
-            if ($result->num_rows > 0) {
+            if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . $count . "</td>";
@@ -188,18 +180,8 @@ if (isset($_GET['download'])) {
             }
             ?>
         </table>
-        <div class="message">
-            <?php
-            if (isset($_GET['message'])) {
-                echo $_GET['message'];
-            }
-            ?>
-        </div>
     </div>
-
-
-
-
+    </div>
     </div>
 
     <script>
@@ -213,14 +195,22 @@ if (isset($_GET['download'])) {
     });
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('category-select');
 
     searchButton.addEventListener('click', function() {
         const searchQuery = searchInput.value.trim();
+        const selectedCategory = categorySelect.value;
 
-        if (searchQuery !== '') {
-            window.location.href = 'search.php?q=' + encodeURIComponent(searchQuery);
+        let queryString = '?search=' + encodeURIComponent(searchQuery);
+
+        if (selectedCategory) {
+            queryString += '&category=' + encodeURIComponent(
+                selectedCategory);
         }
+
+        window.location.href = 'search.php' + queryString;
     });
+
 
     const searchinput = document.getElementById('search-input');
     const searchClearButton = document.getElementById('search-clear-button');

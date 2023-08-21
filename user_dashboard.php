@@ -1,15 +1,46 @@
 <?php
 session_start();
-include 'database.php';
+include 'database2.php';
 
-$is_invalid = false; // Initialize the variable as false
+
+
+$is_invalid = false;
+
+
+
+if (isset($_GET['search'])) {
+    $searchQuery = $conn->real_escape_string($_GET['search']);
+    $categoryFilter = $_GET['category'];
+    $sql = "SELECT * FROM pdf WHERE 1";
+    if (!empty($searchQuery)) {
+        $sql .= " AND (keywords LIKE '%$searchQuery%' OR title LIKE '%$searchQuery%')";
+    }
+   if (!empty($categoryFilter)) {
+        $sql .= " AND category = '$categoryFilter'";
+    }
+   $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+       
+    } else {
+        echo "<div class='no-files'>No files found for the specified keyword or category.</div>";
+    }
+
+    // Store the search keyword in the database
+    if (!empty($searchQuery)) {
+        $insertKeywordSql = "INSERT INTO search_keywords (keyword) VALUES ('$searchQuery')";
+        $conn->query($insertKeywordSql);
+    }
+}
+
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include 'database.php';
 
     $email = $mysqli->real_escape_string($_POST["email"]);
     $sql = sprintf("SELECT * FROM users WHERE email='%s'", $email);
-    $result = $mysqli->query($sql);
+    $result = $conn->query($sql);
 
     if ($result) {
         $user = $result->fetch_assoc();
@@ -39,8 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Check if the user is logged in and has the 'role' value set in the session
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
-    // Redirect the user to the login page
-    header("Location: login.php");
+  header("Location: login.php");
     exit();
 }
 
@@ -110,7 +140,7 @@ $userId = $_SESSION["user_id"]; // Assuming you have the user ID stored in a ses
 
 // Prepare the statement
 $userSql = "SELECT * FROM users WHERE id = ?";
-$stmt = $mysqli->prepare($userSql);
+$stmt = $conn->prepare($userSql);
 
 if (!$stmt) {
     die("Failed to prepare user query: " . $mysqli->error);
@@ -137,14 +167,14 @@ $loginTime = date("Y-m-d H:i:s");
 
 // Step 4: Insert the login history into the database
 $insertSql = "INSERT INTO login_history (user_id, action, timestamp) VALUES ('{$user['id']}', '$loginAction', '$loginTime')";
-$insertResult = $mysqli->query($insertSql);
+$insertResult = $conn->query($insertSql);
 
 if (!$insertResult) {
     die("Failed to insert login history: " . $mysqli->error);
 }
 
-// Step 5: Close the database connection
-$mysqli->close();
+
+$conn->close();
 
 ?>
 <!DOCTYPE html>
@@ -177,6 +207,7 @@ $mysqli->close();
         background-color: #f9f9f9;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 50px;
     }
 
     .file-count {
@@ -187,6 +218,7 @@ $mysqli->close();
     h3 {
         margin: 10px 0;
         font-size: 18px;
+
     }
 
     .default-photo {
@@ -237,6 +269,43 @@ $mysqli->close();
         transform: translateX(0%);
         /* Show the sidebar by moving it back to 0% */
     }
+
+    .keyword-buttons {
+        margin-top: 50px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .keyword-button {
+        padding: 5px 10px;
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    .keyword-button:hover {
+        background-color: #ff9800;
+
+    }
+
+    .keyword-container {
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .centered-heading {
+        color: black;
+        margin-bottom: 10px;
+        align-items: center;
+        margin-top: 100px;
+
+    }
     </style>
 </head>
 
@@ -263,17 +332,12 @@ $mysqli->close();
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="userfeedback.php">
                             <i class='bx bxs-message-dots'></i>
-                            <span class="text">Message</span>
+                            <span class="text">feedback</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#">
-                            <i class='bx bxs-cog'></i>
-                            <span class="text">Settings</span>
-                        </a>
-                    </li>
+
                     <li>
                         <a href="?action=logout">
                             <i class='bx bxs-log-out-circle'></i>
@@ -295,15 +359,18 @@ $mysqli->close();
             <form id="search-form" action="#" method="GET" class="search-form">
                 <div class="search-wrapper">
                     <input type="text" id="search-input" name="search" placeholder="Search..." />
+                    <select id="category-select" name="category">
+                        <option value="">All Categories</option>
+                        <option value="Course">Course</option>
+                        <option value="Note">Note</option>
+
+                    </select>
                     <button type="button" id="search-clear-button" class="clear-button"><i
                             class="fa fa-times"></i></button>
                 </div>
                 <button type="submit" id="search-button"><i class="fa fa-search"></i></button>
             </form>
-            <a href="#" class="notification">
-                <i class="bx bxs-bell"></i>
-                <span class="notification-count">8</span>
-            </a>
+
             <a href="#" class="profile">
                 <div class="profile">
                     <img src="auth/img/library.jpg" alt="Profile Picture" class="profile-picture">
@@ -312,8 +379,32 @@ $mysqli->close();
             </a>
 
         </nav>
+        <?php
 
-        <!-- NAVBAR -->
+include 'database2.php';
+// Retrieve recent search keywords
+$recentKeywordsSql = "SELECT DISTINCT keyword FROM search_keywords ORDER BY search_timestamp DESC LIMIT 5";
+$recentKeywordsResult = $conn->query($recentKeywordsSql);
+if ($recentKeywordsResult->num_rows > 0) {
+    echo "<div class='keyword-container'>";
+    echo "<h2 class='centered-heading'>Recent Search Keywords:</h2>";
+    echo "<div class='keyword-buttons'>";
+    while ($row = $recentKeywordsResult->fetch_assoc()) {
+        echo "<form action='display.php' method='post' style='display: inline-block; margin: 5px;'>";
+        echo "<input type='hidden' name='search' value='" . htmlspecialchars($row['keyword']) . "'>";
+        echo "<button type='submit' class='keyword-button'>" . htmlspecialchars($row['keyword']) . "</button>";
+        echo "</form>";
+    }
+    echo "</div>";
+    echo "</div>";
+
+}
+echo "</form>";
+
+?>
+
+
+
 
         <!-- NAVBAR -->
         <div class="dashboard-container">
@@ -331,44 +422,51 @@ $mysqli->close();
                     echo "<h1>Welcome to e-library</h1>";
                 }
             } else {
-                echo "<h1>Welcome to e-library</h1>";
+                echo "<h1 >Welcome to e-library</h1>";
             }
         
 
         
             // Display the list of available PDF files based on search keyword
 include 'database2.php';
+
 if (isset($_GET['search'])) {
-    $keyword = $conn->real_escape_string($_GET['search']);
+    $searchQuery = $conn->real_escape_string($_GET['search']);
+    $categoryFilter = $_GET['category'];
 
-    if (trim($keyword) !== '') { // Check if the keyword is not empty after trimming
-        $sql = "SELECT * FROM pdf WHERE `keywords` LIKE '%$keyword,%' OR `title` LIKE '%$keyword%' OR `filename` LIKE '%$keyword%' ";
-        $result = $conn->query($sql);
+    // Initialize the base query
+    $sql = "SELECT * FROM pdf WHERE 1";
 
-        if ($result->num_rows > 0) {
-            $count = 1; // Initialize the count variable
-            while ($row = $result->fetch_assoc()) {
-                echo "<div class='file-container'>";
-                echo "<span class='file-count'>" . $count . "</span>";
-                
-              
-                echo "<h3>" . $row['title'] . "</h3>";
-                  echo "<img src='uploads/xyz.jpg' alt='Default Photo' class='default-photo'>";
-                echo "<div class='file-options'>";
-                echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
-                echo "<a class='view-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
-                echo "</div>";
-                echo "</div>";
-                $count++;
-            }
-        } else {
-            echo "<div class='no-files'>No files found for the specified keyword.</div>";
+    if (!empty($searchQuery)) {
+        $sql .= " AND keywords LIKE '%$searchQuery%' OR title LIKE '%$searchQuery%' OR filename LIKE '%$searchQuery%'";
+    }
+
+    if (!empty($categoryFilter)) {
+        $sql .= " AND category = '$categoryFilter'";
+    }
+
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        $count = 1;
+        while ($row = $result->fetch_assoc()) {
+            echo "<div class='file-container'>";
+            echo "<span class='file-count'>" . $count . "</span>";
+
+            echo "<h3>" . $row['title'] . "</h3>";
+            echo "<img src='uploads/xyz.jpg' alt='Default Photo' class='default-photo'>";
+            echo "<div class='file-options'>";
+            echo "<a class='view-button' href='view.php?id=" . $row['id'] . "'>View</a>";
+            echo "<a class='download-button' href='user_dashboard.php?download=" . $row['filename'] . "'>Download</a>";
+            echo "</div>";
+            echo "</div>";
+            $count++;
         }
     } else {
-        echo "<div class='no-files'>Please fill the query in the search bar.</div>";
+        echo "<div class='no-files'>No files found for the specified keyword or category.</div>";
     }
 } else {
-    $sql = "SELECT * FROM pdf ORDER BY time_stamp DESC LIMIT 8";
+    $sql = "SELECT * FROM pdf ORDER BY time_stamp DESC LIMIT 12";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -390,6 +488,8 @@ if (isset($_GET['search'])) {
         echo "<div class='no-files'>No files available.</div>";
     }
 }
+
+
 
 $conn->close();
 ?>

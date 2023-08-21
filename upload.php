@@ -100,16 +100,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
 <body>
     <!-- Dashboard content -->
     <?php
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "project";
-
-    $conn = new mysqli($host, $username, $password, $database);
-
-    if ($conn->connect_errno) {
-        die("Failed to connect to MySQL: " . $conn->connect_error);
-    }
+   include 'database2.php';
 
     // Handle file upload
     if (isset($_FILES['pdfFile'])) {
@@ -134,9 +125,10 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
                 // Retrieve keywords from the form data
                 $keywords = $_POST["keywords"];
                 $title = $_POST["title"];
+                $category = $_POST["category"];
 
                 // Insert the filename, folder path, timestamp, and keywords into the database
-                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp, keywords, title) VALUES ('$filename', '$folder_path', '$time_stamp', '$keywords', '$title')";
+                $sql = "INSERT INTO pdf (filename, folder_path, time_stamp,category, keywords, title) VALUES ('$filename', '$folder_path', '$time_stamp','$category','$keywords', '$title')";
                 if ($conn->query($sql) === TRUE) {
                     echo '<script>alert("File uploaded successfully.");</script>';
                 } else {
@@ -164,7 +156,12 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin") {
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required>
             <br><br>
-
+            <label for="category">Select Category:</label>
+            <select name="category" id="category">
+                <option value="category1">Category 1</option>
+                <option value="category2">Category 2</option>
+            </select>
+            <br>
             <input type="submit" name="submit" value="Upload">
             <button class="btn" name="btn">Reset</button>
             <button class="btn1"><a href="admin_dashboard.php">More</a></button>

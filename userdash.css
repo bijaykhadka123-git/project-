@@ -11,6 +11,19 @@
      padding: 20px;
      position: relative;
      top: 50px;
+     margin-bottom: 4 0px;
+     margin-top: 10px;
+ }
+ 
+ .dashboard_container,
+ h1 {
+     text-align: center;
+     color: forestgreen;
+ }
+ 
+ h1:hover {
+     background-color: red;
+     color: blue;
  }
  
  .container {
@@ -76,11 +89,9 @@
  
  #sidebar {
      position: fixed;
-     /* Adjusted top position */
      left: 0;
      height: 100vh;
-     /* Adjusted height */
-     width: 220px;
+     width: 250px;
      background-color: #333;
      color: #fff;
      padding-top: -10px;
@@ -121,20 +132,8 @@
      transition: background-color 0.3s;
  }
  
- .side-menu a:hover {
-     background-color: #555;
- }
- 
  .side-menu i {
      margin-right: 10px;
- }
- 
- .text {
-     flex-grow: 1;
- }
- 
- .active a {
-     background-color: #555;
  }
  
  .top {
@@ -152,12 +151,7 @@
      font-size: 15px;
      cursor: pointer;
  }
- 
- .logout-button:hover {
-     background-color: #d32f2f;
- }
  /* Navbar Styles */
- /* navbar */
  
  .navbar {
      background-color: #f2f2f2;
@@ -172,7 +166,6 @@
      right: 0;
      z-index: 999;
      height: 25px;
-     /* Increased navbar height */
  }
  /* Profile Picture */
  
@@ -289,8 +282,19 @@
      margin-right: 10px;
      border: none;
      border-radius: 4px;
-     width: 500px;
+     width: 700px;
      height: 20px;
+ }
+ 
+ .navbar .search-form #category-select {
+     position: absolute;
+     padding: 5px;
+     border: none;
+     border-radius: 4px;
+     height: 30px;
+     display: inline;
+     cursor: pointer;
+     margin-left: 580px;
  }
  
  .navbar .search-form #search-button {
@@ -331,28 +335,4 @@
  
  .navbar .search-form .search-wrapper .clear-button.active {
      display: block;
- }
- /* Notification styles */
- 
- .notification {
-     position: fixed;
-     top: 30px;
-     right: 50px;
-     transform: translateY(-50%);
-     z-index: 9999;
- }
- 
- .notification.active {
-     background-color: #4caf50;
- }
- 
- .notification .notification-count {
-     position: absolute;
-     top: -8px;
-     right: -8px;
-     background-color: red;
-     color: #fff;
-     font-size: 12px;
-     padding: 2px 4px;
-     border-radius: 50%;
  }

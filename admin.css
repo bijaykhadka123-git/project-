@@ -220,8 +220,19 @@ body.dark .message {
     margin-right: 10px;
     border: none;
     border-radius: 4px;
-    width: 500px;
+    width: 700px;
     height: 20px;
+}
+
+.navbar .search-form #category-select {
+    position: absolute;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+    height: 30px;
+    display: inline;
+    cursor: pointer;
+    margin-left: 580px;
 }
 
 .navbar .search-form #search-button {
@@ -264,32 +275,6 @@ body.dark .message {
 
 .navbar .search-form .search-wrapper .clear-button.active {
     display: block;
-}
-
-
-/* Notification styles */
-
-.notification {
-    position: fixed;
-    top: 30px;
-    right: 50px;
-    transform: translateY(-50%);
-    z-index: 9999;
-}
-
-.notification.active {
-    background-color: #4caf50;
-}
-
-.notification .notification-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: red;
-    color: #fff;
-    font-size: 12px;
-    padding: 2px 4px;
-    border-radius: 50%;
 }
 
 

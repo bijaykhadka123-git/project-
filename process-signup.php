@@ -43,19 +43,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Debug: Display hashed password
     echo "Hashed Password: " . $hashed_password . "<br>";
 
-    $mysqli = require __DIR__ . "/database.php";
+    include "database2.php";
 
     // Debug: Display $mysqli variable
     echo "MySQLi Object: ";
-    var_dump($mysqli);
+    var_dump($conn);
 
     $role = $_POST["role"];
 
     $sql = "INSERT INTO users (name, email, hash_password, role) VALUES (?, ?, ?, ?)";
-    $stmt = $mysqli->stmt_init();
+    $stmt = $conn->stmt_init();
 
     if (!$stmt->prepare($sql)) {
-        die("SQL error: " . $mysqli->error);
+        die("SQL error: " . $conn->error);
     }
 
     $stmt->bind_param("ssss", $_POST["name"], $_POST["email"], $hashed_password, $role);
@@ -63,11 +63,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("location: login.php"); // Redirect to the login page
         exit();
     } else {
-        if ($mysqli->errno === 1062) {
+        if ($conn->errno === 1062) {
             echo '<script>alert("Email is already taken");</script>';
             die();
         } else {
-            die($mysqli->error . " " . $mysqli->errno);
+            die($conn->error . " " . $conn->errno);
         }
     }
 }

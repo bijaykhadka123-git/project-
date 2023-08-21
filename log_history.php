@@ -2,14 +2,14 @@
 // Step 1: Start the session
 session_start();
 
-include 'database.php';
+include 'database2.php';
 // Step 3: Retrieve login history with user names from the table
 $historySql = "SELECT lh.*, u.name FROM login_history lh
                INNER JOIN users u ON lh.user_id = u.id";
-$historyResult = $mysqli->query($historySql);
+$historyResult = $conn->query($historySql);
 
 if (!$historyResult) {
-    die("Failed to retrieve login history: " . $mysqli->error);
+    die("Failed to retrieve login history: " . $conn->error);
 }
 
 // Step 4: Group the login history by user ID using an associative array
@@ -97,7 +97,7 @@ while ($row = $historyResult->fetch_assoc()) {
 
     <?php
     // Step 5: Close the database connection
-    $mysqli->close();
+    $conn->close();
     ?>
 </body>
 

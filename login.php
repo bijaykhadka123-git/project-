@@ -1,19 +1,14 @@
 <?php
 session_start();
-$is_invalid = false; // Initialize the variable as false
-
+$is_invalid = false; 
 // Check if the user clicked the logout link
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    // Destroy the session
-    session_destroy();
-
-    // Redirect the user to the login page
-    header("Location: auth/login.php");
+     session_destroy();
+     header("Location: auth/login.php");
     exit();
 }
 // Check if the user is already logged in
 if (isset($_SESSION["user_id"])) {
-    // Redirect the user to the appropriate dashboard based on the user role
     if ($_SESSION["role"] === "admin") {
         header("Location: admin_dashboard.php");
         exit();
@@ -24,19 +19,11 @@ if (isset($_SESSION["user_id"])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "project";
+   include 'database2.php';
 
-    $mysqli = new mysqli($host, $username, $password, $database);
-    if ($mysqli->connect_error) {
-        die("Connection failed: " . $mysqli->connect_error);
-    }
-
-    $email = $mysqli->real_escape_string($_POST["email"]);
+    $email = $conn->real_escape_string($_POST["email"]);
     $sql = sprintf("SELECT * FROM users WHERE email='%s'", $email);
-    $result = $mysqli->query($sql);
+    $result = $conn->query($sql);
 
     if ($result) {
         $user = $result->fetch_assoc();
@@ -44,8 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user) {
             if (password_verify($_POST["password"], $user["hash_password"])) {
                 $_SESSION["user_id"] = $user["id"];
-                $_SESSION["role"] = $user["role"]; // Set the "role" value in the session
-
+                $_SESSION["role"] = $user["role"]; 
                 // Redirect the user to the appropriate dashboard based on the user role
                 if ($user["role"] === "admin") {
                     header("Location: admin_dashboard.php");
@@ -61,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $is_invalid = true;
         }
     } else {
-        die("Query failed: " . $mysqli->error);
+        die("Query failed: " . $conn->error);
     }
 }
 
@@ -70,16 +56,7 @@ if (isset($_GET['download'])) {
     $filename = $_GET['download'];
 
     // Perform necessary checks and retrieve the file path from the database
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "project";
-
-    $conn = new mysqli($host, $username, $password, $database);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
+   include 'database2.php';
     $filename = $conn->real_escape_string($filename);
     $sql = "SELECT * FROM pdf WHERE filename = '$filename'";
     $result = $conn->query($sql);
@@ -101,12 +78,6 @@ if (isset($_GET['download'])) {
     }
 }
 
-// Logout functionality
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: login.php");
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -121,6 +92,11 @@ if (isset($_GET['logout'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
     /* CSS for login page */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+    }
+
 
     .container {
         max-width: 400px;
@@ -129,6 +105,8 @@ if (isset($_GET['logout'])) {
         border: 1px solid #ccc;
         border-radius: 5px;
         position: relative;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .cancel-button {
@@ -174,6 +152,16 @@ if (isset($_GET['logout'])) {
     }
 
     button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    button[type="submit"] {
+        width: auto;
         padding: 10px 20px;
         background-color: #4CAF50;
         color: #fff;
